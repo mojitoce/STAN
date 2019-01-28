@@ -1,5 +1,5 @@
 library(data.table)
-setwd("~/Learning/Maths and Stats/STAN/Case Study - Baseball")
+setwd("~/Learning/GitHub/STAN/casestudybaseball")
 
 df <- fread(file = 'efronmorris.txt')
 
@@ -11,3 +11,4 @@ K <- batting.stats$`At-B`
 y <- batting.stats$Hits
 K_new <- batting.stats$`RemainingAt-Bats`
 y_new <- batting.stats$RemainingHits
+d
