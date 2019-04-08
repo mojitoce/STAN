@@ -79,3 +79,31 @@ m4.2 <- map(
   data = d.adult
 )
 precis(m4.2)
+
+
+
+## Fitting a linear model
+m4.3 <- map(alist(height ~ dnorm(mu, sigma),
+                  mu <-  a + b * weight,
+                  a ~ dnorm(178, 100),
+                  b ~ dnorm(0, 10),
+                  sigma ~ dunif(0, 50)), 
+            data = d.adult)
+precis(m4.3, corr = TRUE)
+
+
+# To solve almost perfect correlation of a and b we can try centering our dependent variable
+d.adult$weight <- d.adult$weight - mean(d.adult$weight)
+
+m4.4 <- map(alist(height ~ dnorm(mu, sigma),
+                  mu <-  a + b * weight,
+                  a ~ dnorm(178, 100),
+                  b ~ dnorm(0, 10),
+                  sigma ~ dunif(0, 50)), 
+            data = d.adult)
+precis(m4.4, corr = TRUE)
+
+
+# Plotting posterior inference against the data
+plot(height ~ weight, data = d.adult)
+abline(a = coef(m4.3)['a'], b = coef(m4.4)['b'])
