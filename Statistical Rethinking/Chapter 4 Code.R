@@ -101,9 +101,90 @@ m4.4 <- map(alist(height ~ dnorm(mu, sigma),
                   b ~ dnorm(0, 10),
                   sigma ~ dunif(0, 50)), 
             data = d.adult)
+
+# Table of Estimates
 precis(m4.4, corr = TRUE)
 
 
 # Plotting posterior inference against the data
 plot(height ~ weight, data = d.adult)
 abline(a = coef(m4.3)['a'], b = coef(m4.4)['b'])
+
+
+# Adding uncertainty around the mean
+post <- extract.samples(m4.3)
+post[1:5,]
+
+# Display a few lines to see scatter with increasing amount of data
+N <- 10
+d.adult.N <- d.adult[1:N,]
+
+mN <- map(alist(height ~ dnorm(mu, sigma),
+                  mu <-  a + b * weight,
+                  a ~ dnorm(178, 100),
+                  b ~ dnorm(0, 10),
+                  sigma ~ dunif(0, 50)), 
+            data = d.adult.N)
+
+# extract 20 samples from the posterior
+post <- extract.samples( mN , n=20 )
+# display raw data and sample size
+plot( d.adult.N$weight , d.adult.N$height ,
+      xlim=range(d.adult$weight) , ylim=range(d.adult$height) ,
+      col=rangi2 , xlab="weight" , ylab="height" )
+mtext(concat("N = ",N))
+# plot the lines, with transparency
+for ( i in 1:20 ) {
+  abline( a=post$a[i] , b=post$b[i] , col=col.alpha("black",0.3))
+          }
+
+
+
+### 4.5 Polynomial Regression ###
+plot(height ~ weight, data = d) # Relation is curved
+
+# Standardise data
+d.s <- d %>% 
+  mutate(weight.s = (weight - mean(d$weight)) / sd(d$weight),
+         weight.s2 = weight.s * weight.s,
+         weight.s3 = weight.s ^ 3)
+
+m4.5 <- map(alist(height ~ dnorm(mu, sigma),
+                  mu <-  a + b1 * weight.s + b2 * weight.s2,
+                  a ~ dnorm(178, 100),
+                  b1 ~ dnorm(0, 10),
+                  b2 ~ dnorm(0, 10),
+                  sigma ~ dunif(0, 50)), 
+            data = d.s)
+precis(m4.5)
+
+
+weight.seq <- seq( from=-2.2 , to=2 , length.out=30 )
+pred_dat <- list( weight.s=weight.seq , weight.s2=weight.seq^2 )
+mu <- link( m4.5 , data=pred_dat )
+mu.mean <- apply( mu , 2 , mean )
+mu.PI <- apply( mu , 2 , PI , prob=0.89 )
+sim.height <- sim( m4.5 , data=pred_dat )
+height.PI <- apply( sim.height , 2 , PI , prob=0.89 )
+
+
+plot( height ~ weight.s , d.s , col=col.alpha(rangi2,0.5) )
+lines( weight.seq , mu.mean )
+shade( mu.PI , weight.seq )
+shade( height.PI , weight.seq )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
