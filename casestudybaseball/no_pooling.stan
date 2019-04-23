@@ -9,9 +9,9 @@ data {
   }
 
 parameters {
-  real<lower = 0, upper = 1> phi; // chance of success (pooled)
+  vector<lower = 0, upper = 1>[N] theta; // chance of success (pooled)
 }
 
 model {
-  y ~ binomial(K, phi);
+  y ~ binomial(K, theta);
 }
