@@ -114,3 +114,4 @@ for (i in 1:nrow(div.d)) {
   lines(div.d$Divorce[j] - c(mu3.PI[1, j], mu3.PI[2, j]), rep(i, 2))
   points(div.d$Divorce[j] - c(divorce.PI[1, j], divorce.PI[2, j]), rep(i, 2), pch = 3, cex = 0.6, col = 'gray')
 }
+
